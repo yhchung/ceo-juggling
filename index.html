@@ -1,0 +1,549 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
+<style>body{margin:0;padding:0;background:#0b0e17;color:#ede8df}</style></head><body>
+<title>대표의 저글링</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Press+Start+2P&display=swap">
+<style>
+:root{
+  --bg:#0b0e17; --bg2:#121728; --rock:#2a2320; --rock2:#1a1512;
+  --ink:#ede8df; --mute:#9a95a8; --line:#262b3d;
+  --money:#f5c242; --people:#ff6b7a; --product:#43d6c5; --outside:#9b8cff;
+  --danger:#ff3b3b; --ok:#7ee081;
+  --display:"Black Han Sans","Noto Sans KR",sans-serif;
+  --pixel:"Press Start 2P","Noto Sans KR",monospace;
+  --body:"Noto Sans KR",-apple-system,sans-serif;
+}
+html,body{height:100%;margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#stage{position:relative;width:100%;height:100%;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,14,23,.86);backdrop-filter:blur(4px);overflow-y:auto}
+.card{width:min(560px,100%);display:flex;flex-direction:column;gap:18px;text-align:center}
+h1{font-family:var(--display);font-size:clamp(40px,9vw,64px);line-height:1.02;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 small{display:block;font-family:var(--pixel);font-size:11px;color:var(--money);letter-spacing:.08em;margin-bottom:14px}
+h2{font-family:var(--display);font-size:clamp(28px,6vw,40px);margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0;line-height:1.65;font-size:17px}
+.mute{color:#c3bfcf;font-size:15px}
+.btn{font-family:var(--display);font-size:22px;letter-spacing:.02em;padding:14px 28px;border:0;border-radius:6px;background:var(--money);color:#1a1300;cursor:pointer;box-shadow:0 4px 0 #a37d14}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a37d14}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);box-shadow:none;font-size:16px;padding:10px 18px;font-family:var(--body);font-weight:700}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.key{border-radius:8px;padding:10px 6px;background:var(--bg2);border:1px solid var(--line)}
+.key b{display:block;font-family:var(--pixel);font-size:11px;margin-bottom:6px}
+.key span{font-size:13px;font-weight:700}
+.k-money b{color:var(--money)}.k-people b{color:var(--people)}.k-product b{color:var(--product)}.k-outside b{color:var(--outside)}
+.quote{font-family:var(--body);font-size:clamp(17px,3.6vw,21px);font-weight:500;line-height:1.6;text-wrap:balance;padding:6px 0}
+.quote em{display:block;font-style:normal;font-size:13px;color:#c3bfcf;margin-top:10px;font-family:var(--body);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px 8px}
+.stat b{display:block;font-family:var(--pixel);font-size:16px;color:var(--money);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:#c3bfcf}
+.grade{font-family:var(--pixel);font-size:44px;color:var(--money);text-shadow:0 0 24px rgba(245,194,66,.4)}
+.board{text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13px}
+.board div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.board div:last-child{border:0}
+.toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+#touch{position:absolute;left:0;right:0;bottom:0;height:34%;display:none;pointer-events:none}
+@media (pointer:coarse){#touch{display:block}}
+.mash{font-family:var(--pixel);font-size:12px;color:var(--danger);animation:blink .5s steps(2) infinite}
+@keyframes blink{to{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.mash{animation:none}}
+</style>
+
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="touch"></div>
+
+  <div class="ov" id="ovTitle">
+    <div class="card">
+      <h1><small>STARTUP CEO RHYTHM · <span class="ver"></span></small>대표의 저글링</h1>
+      <p>스타트업 대표는 매일 수십 개의 공을 던진다. 채용, 세무, IR, 노무, 세일즈, 온보딩. 절벽 끝에 서서 리듬을 놓치지 않는 게임.</p>
+      <p class="mute">공이 떨어지면 돈이 샌다. 쉬지 않으면 몸이 무너진다. 그리고 가끔은, 아무리 잘해도 미국 금리가 오른다.</p>
+      <div class="keys">
+        <div class="key k-money"><b>D</b><span>돈</span></div>
+        <div class="key k-people"><b>F</b><span>팀</span></div>
+        <div class="key k-product"><b>J</b><span>제품·고객</span></div>
+        <div class="key k-outside"><b>K</b><span>법무·대관</span></div>
+      </div>
+      <p class="mute">방향키(← ↓ ↑ →)도 된다. SPACE는 <b style="color:var(--ink)">숨 고르기</b>. 건강이 차지만 그동안 공은 떨어진다. 폰에서는 레인을 터치하고, 왼쪽의 SPACE 버튼을 누른다.</p>
+      <div class="row"><button class="btn" id="btnStart">창업하기</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovStage" hidden>
+    <div class="card">
+      <p class="mute" id="stTag">STAGE 1</p>
+      <h2 id="stTitle"></h2>
+      <p id="stDesc"></p>
+      <div class="quote" id="stQuote"></div>
+      <div class="row"><button class="btn" id="btnGo">시작</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovEnd" hidden>
+    <div class="card">
+      <div class="grade" id="endGrade">B</div>
+      <h2 id="endTitle"></h2>
+      <p id="endDesc"></p>
+      <div class="stats">
+        <div class="stat"><b id="sMonths">0</b><span>생존 개월</span></div>
+        <div class="stat"><b id="sHits">0</b><span>처리한 일</span></div>
+        <div class="stat"><b id="sCombo">0</b><span>최대 콤보</span></div>
+      </div>
+      <div class="quote" id="endQuote"></div>
+      <div class="board" id="board"></div>
+      <div class="row"><button class="btn" id="btnRetry">다시 창업하기</button></div>
+      <p class="mute" style="font-size:12px"><span class="ver"></span></p>
+    </div>
+  </div>
+
+  <div class="ov" id="ovAgain" hidden>
+    <div class="card">
+      <p class="mute" id="agTag">잠깐</p>
+      <h2 id="agTitle">꼭 창업해야겠어요?</h2>
+      <p id="agDesc"></p>
+      <div class="row">
+        <button class="btn ghost" id="btnNo">…아니요, 생각 좀</button>
+        <button class="btn" id="btnYes">그래도 하겠습니다</button>
+      </div>
+      <p class="mute" id="agFoot"></p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const VERSION='1.1.0';
+document.querySelectorAll('.ver').forEach(el=>el.textContent='v'+VERSION);
+// ---------- 콘텐츠: 대표가 해야 하는 일 ----------
+// 각 과제는 [라벨, 등장 최소 스테이지(0=1년차 … 4=5년차)]. 연차가 쌓일수록 공의 종류가 바뀐다.
+const LANES = {
+  money:  {name:'돈',   color:'#f5c242', key:'D', tasks:[
+    // 1년차: 둘이서. 세금·정부지원·내 돈
+    ['사업자등록',0],['법인통장 개설',0],['자본금 납입',0],['부가세 신고',0],['원천세 신고',0],['세무사 자료',0],['가수금 입금',0],['런웨이 계산',0],
+    ['초기창업패키지',0],['TIPS 지원서',0],['정부과제 사업비',0],['정부과제 정산',1],['벤처기업 인증',1],['기보 보증대출',1],
+    // 2년차~: 급여·결산·투자
+    ['급여일 잔고',1],['월 결산 검토',1],['법인세 신고',1],['미수금 독촉',2],['클라우드 비용',2],['엔젤 미팅',1],['시드 IR 덱',1],
+    ['투자사 리포트',2],['텀시트 검토',2],['밸류 협상',2],['데이터룸 준비',3],['투자 실사 대응',3],['캡테이블 정리',3],['브릿지 라운드',3],['연간 예산',3],['시리즈B 준비',4],['M&A 제안',4],
+    // AI 시대의 돈: 추론 비용이 곧 번레이트
+    ['대표 급여',0],['마이너스통장',1],['추론 비용',1],['크레딧 소진',2],['GPU 계약',2],['투자자 잠수',2],['세무조사',3],['감사보고서',4]]},
+  people: {name:'팀',   color:'#ff6b7a', key:'F', tasks:[
+    // 2년차(첫 채용)~
+    ['채용 공고',1],['이력서 검토',1],['면접',1],['처우 협의',1],['근로계약서',1],['4대보험 신고',1],['온보딩',1],['수습 평가',1],['1on1',1],['연차 관리',1],['노무사 상담',1],['급여명세서',1],['퇴사 면담',1],
+    // 3년차~: 조직이 된다
+    ['스톡옵션 부여',2],['성과 평가',2],['연봉 협상',2],['팀장 채용',2],['취업규칙 제정',2],['핵심가치 정의',2],['타운홀',2],['갈등 중재',2],['저성과자 면담',2],['연말정산',2],
+    // 4년차~: 경영진
+    ['C레벨 영입',3],['조직 개편',3],['레퍼런스 체크',3],['권고사직',3],['리더십 코칭',3],['보상 체계 개편',4],['핵심인재 이탈',4],
+    // 위임이 안 되는 것들
+    ['공동창업자 갈등',1],['퇴직금 정산',2],['주 52시간',2],['병역특례',2],['첫 해고 통보',2],['친구 해고',2],['에이스 이탈',3],['직장내 괴롭힘',3],['AI가 대체?',3],['재교육 or 해고',3]]},
+  product:{name:'제품', color:'#43d6c5', key:'J', tasks:[
+    // 1년차: 만들고, 물어보고, 첫 손님을 찾는다
+    ['MVP 개발',0],['유저 인터뷰',0],['랜딩페이지',0],['베타 릴리즈',0],['버그 수정',0],['서버 세팅',0],['고객 문의 답변',0],['기능 우선순위',0],['앱스토어 심사',0],['개인정보 방침',0],
+    ['첫 고객 찾기',0],['지인 영업',0],['SNS 운영',0],['커뮤니티 글',0],
+    // 2년차~: 측정하고 고치고 판다
+    ['리텐션 분석',1],['가격 정책',1],['장애 대응',1],['릴리즈 노트',1],['QA',1],['데이터 분석',1],['스프린트 회의',1],['디자인 리뷰',1],
+    ['세일즈 콜',1],['고객 미팅',1],['견적서',1],['제안서 작성',1],['고객 클레임',1],['온보딩 콜',1],['뉴스레터',1],['광고 집행',1],['콘텐츠 마케팅',1],
+    // 3년차~: PMF와 파이프라인
+    ['PMF 검증',2],['제품 로드맵',2],['OKR',2],['기술 부채',2],['보안 점검',2],['인프라 비용',2],
+    ['파이프라인 점검',2],['대기업 PoC',2],['고객 이탈 분석',2],['경쟁사 분석',2],['케이스 스터디',2],['퍼포먼스 마케팅',2],['브랜드 캠페인',2],['CS 매뉴얼',2],['재계약 협상',2],
+    // 4년차~: 손을 떼야 하는데 못 뗀다
+    ['아키텍처 결정',3],['API 장애',3],['신규 제품 라인',3],['엔터프라이즈 딜',3],['CRM 정리',3],['글로벌 버전',4],['해외 첫 고객',4],
+    // 과정이 아니라 대표 휴대폰에 직접 꽂히는 순간들
+    ['서버 다운',0],['새벽 3시 호출',0],['데모 실패',1],['미룬 진료',1],
+    // 2026 AI 네이티브
+    ['평가셋 실패',1],['할루시네이션',1],['모델 종료',1],['바이브코딩 버그',1],['레이트 리밋',1],['벤더 장애',1],['프롬프트 인젝션',2],['에이전트 폭주',2],['컨텍스트 초과',2],['GPU 대기',2]]},
+  outside:{name:'대외', color:'#9b8cff', key:'K', tasks:[
+    // 3년차~: 법무 · 이해관계자 · 대관
+    ['계약서 검토',2],['NDA 검토',2],['상표 출원',2],['특허 출원',2],['약관 개정',2],['변호사 상담',2],['내용증명',2],
+    ['주주 서한',2],['투자자 미팅',2],['주주간계약',2],['파트너십 미팅',2],['MOU',2],['보도자료',2],['컨퍼런스 발표',2],['데모데이',2],['네트워킹',2],['어워드 지원',2],
+    ['과제 발표평가',2],['지자체 협약',2],['협회 가입',2],
+    // 4년차~
+    ['주주총회',3],['이사회',3],['언론 인터뷰',3],['규제 대응',3],['공공 입찰',3],['부처 간담회',3],['국회 토론회',3],['소송 대응',3],['정부 자문회의',4],['글로벌 파트너',4],['해외 법인 설립',4],
+    // 조달 관문과 그 대가
+    ['담당자 잠수',2],['텅 빈 부스',2],['휴가 취소',2],['ISMS 인증',3],['모의해킹',3],['AI 벤더 심사',3],['학습 안 함 증명',3],['AI 도입 심의',3],['면책 요구',3]]}
+};
+function pickTask(lk){ const pool=LANES[lk].tasks.filter(t=>t[1]<=G.stageIdx); return (pool.length?rnd(pool):rnd(LANES[lk].tasks))[0]; }
+const ORDER = ['money','people','product','outside'];
+const SHOCKS = [
+  {t:'미국 금리 인상',   d:'투자 시장이 얼어붙었다. 협상 중이던 딜이 사라진다.'},
+  {t:'핵심 개발자 퇴사', d:'금요일 오후 4시, 1on1 요청이 들어왔다.'},
+  {t:'대형 고객 이탈',   d:'매출의 30%가 메일 한 통으로 증발했다.'},
+  {t:'경쟁사 대규모 투자 유치', d:'같은 시장, 10배의 자본. 오늘 아침 뉴스.'},
+  {t:'투자사 리드 철회', d:'"내부 사정으로 이번 라운드는 어렵게 됐습니다."'},
+  {t:'서버 전면 장애',   d:'새벽 3시. 슬랙 알림이 멈추지 않는다.'},
+  {t:'노동청 진정',      d:'예상하지 못한 봉투가 도착했다.'},
+  {t:'팬데믹',           d:'세상이 멈췄다. 계획은 종이가 됐다.'},
+  {t:'환율 급등',        d:'클라우드 비용이 하룻밤에 20% 올랐다.'},
+  {t:'플랫폼 정책 변경', d:'의존하던 API가 다음 달 종료된다.'},
+  {t:'공동창업자 결별',  d:'캡테이블이 딸린 이혼이다. 이사회가 지켜보고 있다.'},
+  {t:'OpenAI가 그 기능 출시', d:'키노트에서 우리 로드맵을 봤다.'},
+  {t:'개인정보 유출',    d:'72시간 안에 모든 고객에게 알려야 한다.'},
+  {t:'국세청 세무조사',  d:'3년치 장부를 다시 연다.'},
+  {t:'애크하이어 제안',  d:'팀을 원한다. 회사가 아니라. 미션도 아니라.'}
+];
+const QUOTES = [
+  ['CEO의 유일한 보편적인 직무는 회사의 성공을 보장하는 것이다.','Sam Altman'],
+  ['위기와 강한 경쟁, 생존이 걸린 상황에는 전시 CEO가 필요하다.','Ben Horowitz'],
+  ['일어날 수 있는 최악의 상황은 무엇인가? 그때 나는 무엇을 할 것인가?','Ben Horowitz · AB Thinking'],
+  ['거시적인 흐름은 피하기 어렵다. 대부분 정도만 다를 뿐, 전시 상황일 수밖에 없다.','CEO 조직 매니지먼트 강의안'],
+  ['내 성공의 비밀은 세계 최고의 인재를 채용하기 위해 가능한 모든 노력을 했다는 것이다.','Steve Jobs'],
+  ['HR 업무의 90%는 채용이다.','Laszlo Bock'],
+  ['경영진 채용과 이해관계자와의 관계. 이 둘은 언제나 위임할 수 없다. 그 외의 일은 모두 위임이 가능하다.','CEO 조직 매니지먼트 강의안'],
+  ['조직은 설계와 사람으로 이루어진다.','Ray Dalio'],
+  ['내가 가장 최상의 능력을 가졌다고 느꼈을 때는 시간의 50%가 계획되어 있지 않을 때다.','Steve Jobs'],
+  ['CEO도 두려움을 느낀다. CEO도 피드백이 필요하다. CEO도 하나의 직업이다.','CEO 조직 매니지먼트 강의안'],
+  ['대표의 고민은 물어볼 곳이 없어요.','어느 대표의 말 · 강의안'],
+  ['우리는 날마다 다시 태어나고 매일매일 새로운 삶을 살고 있어요.','Jeff Bezos · Day 1'],
+  ['결국 어떤 사람과 함께 할 것인가, 어떤 식으로 함께 일할 것인가가 조직의 전부다.','장영학'],
+  ['인재 밀도가 높을수록 직원들에게 허용되는 자유는 더욱 커진다.','Reed Hastings']
+];
+const STAGES = [
+  {name:'창업',       year:'1년차', lanes:['product','money'],                  bpm:92,  secs:32, shocks:0, density:.55, desc:'둘이서 시작했다. 만들고, 통장 잔고를 본다. 이 둘만 잘하면 될 줄 알았다.'},
+  {name:'첫 채용',    year:'2년차', lanes:['product','money','people'],         bpm:104, secs:38, shocks:1, density:.62, desc:'사람이 들어왔다. 채용, 노무, 4대보험, 온보딩. 공이 하나 늘었을 뿐인데 손이 모자란다.'},
+  {name:'PMF 찾기',   year:'3년차', lanes:['money','people','product','outside'],bpm:116,secs:44, shocks:1, density:.68, desc:'계약서, 주주, 정부. 대외 레인이 열렸다. 이제 네 개의 공. 그리고 세상은 당신의 사정을 봐주지 않는다.'},
+  {name:'시리즈 A',   year:'4년차', lanes:['money','people','product','outside'],bpm:128,secs:50, shocks:2, density:.76, desc:'팀이 커졌다. 팀 레인을 잘 치면 팀이 제품과 대외를 잠시 맡아준다. 돈과 사람은 여전히 당신 몫이다.'},
+  {name:'스케일업',   year:'5년차', lanes:['money','people','product','outside'],bpm:140,secs:56, shocks:3, density:.84, desc:'속도가 미쳤다. 여기서 살아남으면 당신은 이미 대표다. 살아남지 못해도, 사실 그렇다.'}
+];
+
+// ---------- 상태 ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W=0,H=0,DPR=1;
+const G = {
+  running:false, stageIdx:0, stage:null, lanes:[], notes:[], t0:0, now:0, lastBeat:-1,
+  runway:100, health:100, team:0, delegUntil:0,
+  combo:0, maxCombo:0, hits:0, perfects:0, misses:0, months:0, monthsBank:0,
+  shake:0, flashes:[], particles:[], resting:false, restUntil:0,
+  shock:null, shockPlan:[], msg:null, keyDown:{}, laneFlash:{}, ended:false, fatigue:0
+};
+const HIT_Y = ()=> H*0.80;
+const SPEED = ()=> H*0.55/1000; // px per ms (travel 1000ms visible)
+let audio=null;
+function beep(freq,dur,type,vol){ if(!audio) return; try{ const o=audio.createOscillator(), g=audio.createGain(); o.type=type||'square'; o.frequency.value=freq; g.gain.value=vol||.05; o.connect(g); g.connect(audio.destination); const t=audio.currentTime; g.gain.setValueAtTime(vol||.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.start(t); o.stop(t+dur);}catch(e){} }
+function noise(dur,vol){ if(!audio) return; try{ const b=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length); const s=audio.createBufferSource(); s.buffer=b; const g=audio.createGain(); g.gain.value=vol||.2; s.connect(g); g.connect(audio.destination); s.start(); }catch(e){} }
+
+function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener('resize',resize); resize();
+
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function laneX(i){ const n=G.lanes.length; const left=W*0.30, right=W-16; const w=(right-left)/n; return left+w*i+w/2; }
+function laneW(){ const n=G.lanes.length; return (W-16-W*0.30)/n; }
+
+// ---------- 스테이지 ----------
+function startStage(i){
+  G.stageIdx=i; const s=STAGES[i]; G.stage=s; G.lanes=ORDER.filter(k=>s.lanes.includes(k)); G.notes=[]; G.particles=[]; G.flashes=[];
+  G.t0=performance.now(); G.now=0; G.lastBeat=-1; G.shock=null; G.msg=null; G.delegUntil=0; G.resting=false; G.fatigue=0;
+  // 충격 이벤트 예정 시각
+  G.shockPlan=[]; for(let k=0;k<s.shocks;k++){ G.shockPlan.push(s.secs*1000*(0.3+0.5*(k+Math.random()*.6)/(s.shocks))); }
+  G.shockPlan.sort((a,b)=>a-b);
+  G.running=true; G.ended=false; requestAnimationFrame(loop);
+}
+function beatMs(){ return 60000/G.stage.bpm; }
+function scheduleNotes(){
+  const bm=beatMs(); const beat=Math.floor((G.now+1400)/bm); // 1.4초 앞서 생성
+  while(G.lastBeat<beat){ G.lastBeat++; const t=G.lastBeat*bm; if(t<1200) continue; if(t>G.stage.secs*1000-600) continue;
+    if(Math.random()<G.stage.density){ const li=Math.floor(Math.random()*G.lanes.length); const lk=G.lanes[li]; G.notes.push({lane:li,kind:lk,t:t,label:pickTask(lk),state:0}); }
+    // 고밀도 스테이지는 가끔 2개 동시
+    if(G.stageIdx>=3 && Math.random()<0.18){ let lj=Math.floor(Math.random()*G.lanes.length); const lk=G.lanes[lj]; if(!G.notes.some(n=>n.t===t&&n.lane===lj)) G.notes.push({lane:lj,kind:lk,t:t,label:pickTask(lk),state:0}); }
+  }
+}
+function judge(li){
+  if(!G.running||G.shock) return;
+  G.laneFlash[li]=G.now;
+  let best=null,bd=1e9;
+  for(const n of G.notes){ if(n.state||n.lane!==li) continue; const d=Math.abs(n.t-G.now); if(d<bd){bd=d;best=n;} }
+  if(best && bd<=170){ hit(best, bd<=80?'PERFECT':'GOOD'); }
+  else { // 헛스윙: 건강 살짝 소모
+    G.health=Math.max(0,G.health-0.6); beep(120,.05,'triangle',.03);
+  }
+}
+function hit(n,q){
+  n.state=1; const perfect=q==='PERFECT'; G.hits++; if(perfect) G.perfects++; G.combo++; G.maxCombo=Math.max(G.maxCombo,G.combo);
+  const gain = perfect?1.0:0.6;
+  if(n.kind==='money'){ G.runway=Math.min(100,G.runway+5*gain); }
+  if(n.kind==='people'){ G.team=Math.min(100,G.team+14*gain); if(G.team>=100 && G.stageIdx>=3){ G.team=0; G.delegUntil=G.now+8000; say('팀이 제품·대외를 맡았다 (8초)','#7ee081'); } }
+  // 일은 건강을 쓴다
+  G.health=Math.max(0,G.health-(0.9-0.3*gain));
+  G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:q,color:perfect?'#fff':LANES[n.kind].color,t:G.now});
+  burst(laneX(n.lane),HIT_Y(),LANES[n.kind].color,perfect?14:8);
+  beep(perfect?880:660,.08,'square',.05); if(G.combo%10===0) beep(1320,.12,'square',.05);
+}
+function miss(n){
+  n.state=2; G.misses++; G.combo=0;
+  const dmg = n.kind==='money'?7:(n.kind==='people'?6:4);
+  G.runway=Math.max(0,G.runway-dmg); G.health=Math.max(0,G.health-2.2);
+  G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:'MISS',color:'#ff3b3b',t:G.now}); G.shake=Math.max(G.shake,6);
+  noise(.08,.12);
+}
+function burst(x,y,color,n){ for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, s=1+Math.random()*4; G.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:1,color}); } }
+function say(text,color){ G.msg={text,color:color||'#ede8df',t:G.now}; }
+
+function triggerShock(){
+  const sh=rnd(SHOCKS); G.shock={info:sh,t:G.now,mash:0,need:8+G.stageIdx*3,phase:0};
+  // 와장창: 떠 있는 공 전부 깨진다
+  let n=0; for(const x of G.notes){ if(!x.state){ x.state=3; n++; burst(laneX(x.lane), HIT_Y()-(x.t-G.now)*SPEED(), '#ff3b3b', 6);} }
+  G.combo=0; G.runway=Math.max(0,G.runway-12-G.stageIdx*2); G.shake=22; noise(.5,.35); beep(55,.6,'sawtooth',.12);
+}
+
+// ---------- 루프 ----------
+let lastFrame=0;
+function loop(ts){
+  if(!G.running) return;
+  const dt=Math.min(50,ts-(lastFrame||ts)); lastFrame=ts;
+  if(G.shock){ // 시간 정지, 버티기
+    if(ts-G.shock.realT0>4200) { const ok=G.shock.mash>=G.shock.need; endShockReal(ok, ts); }
+    draw(); requestAnimationFrame(loop); return;
+  }
+  G.now=ts-G.t0;
+  scheduleNotes();
+  // 미스 판정
+  for(const n of G.notes){ if(!n.state && G.now-n.t>170){ if(G.delegUntil>G.now && (n.kind==='product'||n.kind==='outside')){ n.state=1; G.hits++; G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:'팀',color:'#7ee081',t:G.now}); } else miss(n);} }
+  G.notes=G.notes.filter(n=>n.state===0 || G.now-n.t<600);
+  // 자원 흐름
+  const sec=dt/1000;
+  G.runway=Math.max(0,G.runway-(1.6+G.stageIdx*0.45)*sec);   // 돈은 항상 샌다
+  if(G.resting){ if(G.now>G.restUntil){ G.resting=false; } else G.health=Math.min(100,G.health+16*sec); }
+  else { G.fatigue+=sec; G.health=Math.max(0,G.health-(0.35+G.stageIdx*0.12)*sec); }
+  G.monthsBank+=sec; if(G.monthsBank>=2.2){ G.monthsBank-=2.2; G.months++; }
+  // 충격
+  if(G.shockPlan.length && G.now>=G.shockPlan[0]){ G.shockPlan.shift(); triggerShock(); G.shock.realT0=ts; }
+  // 파티클
+  for(const p of G.particles){ p.x+=p.vx; p.y+=p.vy; p.vy+=.15; p.life-=.03; } G.particles=G.particles.filter(p=>p.life>0);
+  G.shake*=0.86;
+  // 종료
+  if(G.runway<=0) return gameOver('money');
+  if(G.health<=0) return gameOver('health');
+  if(G.now>=G.stage.secs*1000+400) return stageClear();
+  draw(); requestAnimationFrame(loop);
+}
+function endShockReal(ok, ts){
+  const s=G.shock; G.shock=null;
+  const paused=ts-s.realT0; G.t0+=paused;  // 정지 시간만큼 기준점 이동
+  for(const k in G.shockPlan) G.shockPlan[k]=G.shockPlan[k];
+  if(ok){ say('버텼다. 계속 간다.','#7ee081'); beep(660,.15,'square',.06); }
+  else { G.runway=Math.max(0,G.runway-10); G.health=Math.max(0,G.health-12); say('버티지 못했다. 런웨이와 건강이 깎였다.','#ff3b3b'); noise(.3,.3); }
+}
+
+// ---------- 그리기 ----------
+function draw(){
+  ctx.save(); if(G.shake>0.5){ ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake); }
+  // 배경 밤하늘
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b0e17'); g.addColorStop(1,'#151b2e'); ctx.fillStyle=g; ctx.fillRect(-20,-20,W+40,H+40);
+  // 별
+  ctx.fillStyle='rgba(237,232,223,.35)'; for(let i=0;i<40;i++){ const x=(i*97)%W, y=(i*53)%(H*0.6); ctx.fillRect(x,y,1.5,1.5); }
+  drawCliff(); drawLanes(); drawNotes(); drawParticles(); if(G.stage) drawHUD();
+  if(G.shock) drawShock();
+  ctx.restore();
+}
+function drawCliff(){
+  // 절벽: 왼쪽 땅. 런웨이가 줄수록 땅이 깎여 대표가 절벽 끝에 선다.
+  const groundY=H*0.86; const edge=W*0.06+ (W*0.20)*(G.runway/100);
+  ctx.fillStyle='#1a1512'; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(edge,groundY); ctx.lineTo(edge-14,groundY+30); ctx.lineTo(edge-30,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#2a2320'; ctx.fillRect(0,groundY,edge,8);
+  // 대표 (픽셀 인간)
+  const px=edge-22, py=groundY; const lean=G.runway<25? Math.sin(G.now/120)*3:0;
+  ctx.save(); ctx.translate(px+lean,py);
+  const skin=G.health<30?'#c9b7b0':'#f1d3c0', shirt=G.resting?'#7ee081':'#ede8df';
+  ctx.fillStyle=skin; ctx.fillRect(-7,-46,14,14); // 머리
+  ctx.fillStyle='#22180f'; ctx.fillRect(-7,-46,14,4); // 머리카락
+  ctx.fillStyle=shirt; ctx.fillRect(-9,-32,18,18); // 몸
+  ctx.fillStyle='#2d3a5a'; ctx.fillRect(-8,-14,7,14); ctx.fillRect(1,-14,7,14); // 다리
+  // 팔: 저글링
+  ctx.fillStyle=skin; const arm=Math.sin(G.now/150)*6; ctx.fillRect(-15,-30+arm,6,4); ctx.fillRect(9,-30-arm,6,4);
+  // 눈 (건강 낮으면 다크서클)
+  ctx.fillStyle='#22180f'; ctx.fillRect(-4,-40,2,2); ctx.fillRect(2,-40,2,2); if(G.health<40){ ctx.fillStyle='#6a4a6a'; ctx.fillRect(-4,-38,2,1); ctx.fillRect(2,-38,2,1);}
+  // 머리 위 저글링 공
+  for(let i=0;i<G.lanes.length;i++){ const ph=G.now/300+i*Math.PI*2/G.lanes.length; ctx.fillStyle=LANES[G.lanes[i]].color; ctx.beginPath(); ctx.arc(Math.cos(ph)*16, -60+Math.sin(ph)*10, 4,0,Math.PI*2); ctx.fill(); }
+  ctx.restore();
+  // 절벽 아래 표시
+  ctx.fillStyle='#ff6b6b'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText('RUNWAY', 8, groundY+28);
+  ctx.fillStyle='#fff'; ctx.font='bold 22px "Noto Sans KR"'; ctx.fillText(Math.round(G.runway)+'%', 8, groundY+54);
+}
+function drawLanes(){
+  const n=G.lanes.length, lw=laneW(), hy=HIT_Y();
+  for(let i=0;i<n;i++){ const x=laneX(i)-lw/2; const k=G.lanes[i]; const c=LANES[k].color;
+    ctx.fillStyle= (i%2? 'rgba(255,255,255,.025)':'rgba(255,255,255,.045)'); ctx.fillRect(x,0,lw,H);
+    const f=G.laneFlash[i]; if(f!==undefined && G.now-f<120){ ctx.fillStyle=c+'33'; ctx.fillRect(x,0,lw,H); }
+    // 히트존
+    ctx.strokeStyle=c; ctx.lineWidth=2; ctx.globalAlpha=.9; ctx.beginPath(); ctx.arc(laneX(i),hy,Math.min(26,lw*0.32),0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+    // 키 라벨
+    ctx.fillStyle=c; ctx.font='16px "Press Start 2P"'; ctx.textAlign='center'; ctx.fillText(LANES[k].key, laneX(i), hy+52);
+    ctx.fillStyle='#fff'; ctx.font='bold 17px "Noto Sans KR"'; ctx.fillText(LANES[k].name, laneX(i), hy+76);
+    if(G.delegUntil>G.now && (k==='product'||k==='outside')){ ctx.fillStyle='rgba(126,224,129,.15)'; ctx.fillRect(x,0,lw,H); ctx.fillStyle='#7ee081'; ctx.font='bold 15px "Noto Sans KR"'; ctx.fillText('팀이 맡는 중', laneX(i), hy-90); }
+  }
+  ctx.strokeStyle='rgba(237,232,223,.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W*0.30,hy); ctx.lineTo(W-16,hy); ctx.stroke();
+}
+function drawNotes(){
+  const hy=HIT_Y(), sp=SPEED(), lw=laneW(); const r=Math.min(18,lw*0.22);
+  for(const n of G.notes){ const y=hy-(n.t-G.now)*sp; if(y<-40||y>H+40) continue; const x=laneX(n.lane); const c=LANES[n.kind].color;
+    if(n.state===0){ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.arc(x+r*.3,y+r*.3,r*.55,0,Math.PI*2); ctx.fill();
+      const fs=lw<80?13:16; ctx.font='bold '+fs+'px "Noto Sans KR"'; ctx.textAlign='center'; const tw=ctx.measureText(n.label).width+16; 
+      ctx.fillStyle='rgba(11,14,23,.92)'; ctx.fillRect(x-tw/2,y+r+4,tw,fs+10); ctx.strokeStyle=c; ctx.lineWidth=1.5; ctx.strokeRect(x-tw/2,y+r+4,tw,fs+10);
+      ctx.fillStyle='#fff'; ctx.fillText(n.label,x,y+r+4+fs+2); }
+    else if(n.state===2){ ctx.globalAlpha=Math.max(0,1-(G.now-n.t)/500); ctx.fillStyle='#ff3b3b'; ctx.beginPath(); ctx.arc(x,hy+(G.now-n.t)*.25,r*.8,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
+  }
+  for(const f of G.flashes){ const a=1-(G.now-f.t)/600; if(a<=0) continue; ctx.globalAlpha=a; ctx.fillStyle=f.color; ctx.font='14px "Press Start 2P"'; ctx.textAlign='center'; ctx.fillText(f.text,f.x,f.y-(1-a)*30); }
+  ctx.globalAlpha=1; G.flashes=G.flashes.filter(f=>G.now-f.t<600);
+}
+function drawParticles(){ for(const p of G.particles){ ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,3,3);} ctx.globalAlpha=1; }
+function bar(x,y,w,h,v,color,label){ ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(x,y,w,h); ctx.fillStyle=color; ctx.fillRect(x,y,w*Math.max(0,Math.min(1,v/100)),h); ctx.fillStyle='#ede8df'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText(label,x,y-7); }
+function drawHUD(){
+  const s=G.stage; const left=W*0.30+8;
+  ctx.fillStyle='#f5c242'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText('STAGE '+(G.stageIdx+1)+'/5', left, 20);
+  ctx.fillStyle='#fff'; ctx.font='bold 20px "Noto Sans KR"'; ctx.fillText(s.name+'  '+s.year, left, 44);
+  const prog=Math.min(1,G.now/(s.secs*1000)); ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(left,52,W-16-left,4); ctx.fillStyle='#ede8df'; ctx.fillRect(left,52,(W-16-left)*prog,4);
+  // 콤보
+  ctx.textAlign='right'; ctx.fillStyle=G.combo>=10?'#f5c242':'#ede8df'; ctx.font=(G.combo>=10?'16px':'12px')+' "Press Start 2P"'; ctx.fillText(G.combo+' COMBO', W-16, 22);
+  // 왼쪽 자원 바
+  const bx=8, bw=W*0.30-24;
+  bar(bx,80,bw,12,G.health, G.health<30?'#ff3b3b':'#7ee081','HEALTH');
+  bar(bx,116,bw,12,G.team,'#ff6b7a','TEAM');
+  ctx.fillStyle='#ede8df'; ctx.font='11px "Press Start 2P"'; ctx.fillText('MONTH '+G.months, bx, 152);
+  if(G.resting){ ctx.fillStyle='#7ee081'; ctx.font='bold 15px "Noto Sans KR"'; ctx.textAlign='left'; ctx.fillText('쉬는 중. 공은 떨어진다', bx, 180, bw); }
+  else if(G.health<30){ ctx.fillStyle='#ff3b3b'; ctx.font='bold 15px "Noto Sans KR"'; ctx.textAlign='left'; ctx.fillText('건강 위험. 쉬어라', bx, 180, bw); }
+  // SPACE 버튼 (폰: 왼쪽 영역 터치)
+  const bwid=W*0.30-24, bh=Math.max(52,H*0.09), byy=H*0.86-bh-104, pressed=G.resting||(G.shock&&performance.now()-(G.lastSpace||0)<120);
+  ctx.fillStyle=G.shock?'#ff3b3b':(G.resting?'#7ee081':'rgba(255,255,255,.10)'); ctx.beginPath(); ctx.roundRect(8,byy+(pressed?3:0),bwid,bh,10); ctx.fill();
+  ctx.strokeStyle=G.shock?'#fff':'rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=G.shock||G.resting?'#0b0e17':'#fff'; ctx.textAlign='center'; ctx.font='11px "Press Start 2P"'; ctx.fillText('SPACE',8+bwid/2,byy+(pressed?3:0)+bh/2-6);
+  ctx.font='bold 14px "Noto Sans KR"'; ctx.fillText(G.shock?'버텨! 연타':(G.resting?'쉬는 중':'숨 고르기'),8+bwid/2,byy+(pressed?3:0)+bh/2+14);
+  if(G.msg && G.now-G.msg.t<2200){ ctx.globalAlpha=Math.min(1,(2200-(G.now-G.msg.t))/500); ctx.fillStyle=G.msg.color; ctx.font='bold 20px "Noto Sans KR"'; ctx.textAlign='center'; ctx.fillText(G.msg.text,(W*0.30+W)/2,H*0.30); ctx.globalAlpha=1; }
+}
+function drawShock(){
+  const s=G.shock; ctx.fillStyle='rgba(120,0,0,.45)'; ctx.fillRect(-20,-20,W+40,H+40);
+  const cx=W/2, cy=H*0.42;
+  ctx.textAlign='center'; ctx.fillStyle='#ff3b3b'; ctx.font='bold 16px "Noto Sans KR"'; ctx.fillText('!!! 외부 충격 !!!',cx,cy-74);
+  ctx.fillStyle='#fff'; ctx.font='bold '+Math.min(34,W/14)+'px "Black Han Sans"'; ctx.fillText(s.info.t,cx,cy-24);
+  ctx.fillStyle='#fff'; ctx.font='17px "Noto Sans KR"'; ctx.fillText(s.info.d,cx,cy+10);
+  ctx.fillStyle='#f5c242'; ctx.font='bold 18px "Noto Sans KR"'; ctx.fillText('던지던 공이 전부 깨졌다. SPACE(왼쪽 버튼) 연타로 버텨라',cx,cy+44);
+  const w=Math.min(320,W-60); ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(cx-w/2,cy+62,w,14); ctx.fillStyle='#f5c242'; ctx.fillRect(cx-w/2,cy+62,w*Math.min(1,s.mash/s.need),14);
+  const remain=Math.max(0,4.2-(performance.now()-s.realT0)/1000); ctx.fillStyle='#fff'; ctx.font='14px "Press Start 2P"'; ctx.fillText(remain.toFixed(1)+'s  '+s.mash+'/'+s.need,cx,cy+104);
+}
+
+// ---------- 입력 ----------
+function pressSpace(){
+  if(!G.running) return; G.lastSpace=performance.now();
+  if(G.shock){ G.shock.mash++; G.shake=8; beep(200+G.shock.mash*20,.05,'square',.04); return; }
+  if(!G.resting){ G.resting=true; G.restUntil=G.now+1500; }
+}
+const KEYMAP={'KeyD':'money','KeyF':'people','KeyJ':'product','KeyK':'outside','ArrowLeft':'money','ArrowDown':'people','ArrowUp':'product','ArrowRight':'outside'};
+window.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.code==='Space'){ e.preventDefault(); pressSpace(); return; }
+  if(KEYMAP[e.code]!==undefined){ e.preventDefault(); const li=G.lanes.indexOf(KEYMAP[e.code]); if(li>=0) judge(li); }
+});
+const touch=document.getElementById('touch');
+cv.addEventListener('pointerdown',e=>{
+  if(!G.running) return; const x=e.clientX-cv.getBoundingClientRect().left;
+  if(x<W*0.30){ pressSpace(); return; }
+  if(G.shock){ pressSpace(); return; }
+  const lw=laneW(); const li=Math.floor((x-W*0.30)/lw); if(li>=0&&li<G.lanes.length) judge(li);
+});
+
+// ---------- 흐름 ----------
+const $=id=>document.getElementById(id);
+function showStageCard(i){
+  const s=STAGES[i]; $('stTag').textContent='STAGE '+(i+1)+' / 5  ·  '+s.year; $('stTitle').textContent=s.name; $('stDesc').textContent=s.desc;
+  const q=QUOTES[[0,4,3,6,1][i]]; $('stQuote').innerHTML='“'+q[0]+'”<em>'+q[1]+'</em>';
+  $('ovStage').hidden=false;
+}
+$('btnStart').addEventListener('click',()=>{ try{ audio=audio||new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); }catch(e){} $('ovTitle').hidden=true; resetRun(); showStageCard(0); });
+$('btnGo').addEventListener('click',()=>{ $('ovStage').hidden=true; startStage(G.stageIdx); });
+// 만류 문구: [제목, 본문, 그래도 누르면 돌아오는 반박]
+// 첫 라운드는 결말별 전용, 이후 라운드는 공용 풀에서 중복 없이 순환
+const AGAIN_FIRST={
+  '자금 소진':[
+    ['방금 절벽에서 떨어졌잖아요.','통계상 대부분은 두 번째도 떨어집니다. 그래도요?','"그래도"라고 답하는 사람들이 대표가 됩니다. 축하합니다. 아니, 위로합니다.'],
+    ['통장이 먼저 비었던 거, 기억하시죠?','이번엔 런웨이 계산기라도 켜고 하실 건가요?','계산기는 켜셨는데 숫자는 안 보시는군요. 대표들 다 그래요.']
+  ],
+  '번아웃':[
+    ['번아웃까지 갔었는데요.','이번엔 SPACE를 좀 누르실 건가요?','대표의 건강은 회사의 인프라입니다. 인프라 점검 안 하고 또 가시네요.'],
+    ['몸이 먼저 무너졌어요.','병원은 다녀오셨어요? 게임 말고 진짜로.','"괜찮다"는 대표의 말은 재무제표만큼 믿을 게 못 됩니다.']
+  ],
+  '생존':[
+    ['5년을 버텼으면 충분히 증명했어요.','굳이 또 하시겠다고요?','이게 바로 창업가 우상화의 폐해입니다. 본인이 본인을 우상화하는 중.'],
+    ['살아남으셨잖아요. 그걸로 됐어요.','두 번째는 운이 아니라 실력이라는 걸 증명하고 싶으신 거죠?','네, 그 마음이 두 번째 회사를 망치는 가장 흔한 이유입니다.']
+  ]
+};
+const AGAIN_POOL=[
+  ['가족이랑 상의는 하셨어요?','통장은요? 마이너스통장 말고 진짜 통장.','"내가 아니면 누가 하겠어"는 모든 대표가 하는 말입니다. 전원.'],
+  ['회사 다니면 월급이 매달 나옵니다.','매달요. 자동으로. 세금도 회사가 떼줍니다.','알고 계셨군요. 그런데도 하시는 거군요.'],
+  ['진짜로요? 방금 그거 보고도요?','절벽은 그대로고, 공은 더 늘어납니다. 줄어드는 건 당신 머리숱뿐입니다.','머리숱은 농담이었는데 표정이 진지하시네요.'],
+  ['잠깐만요. 마지막으로 하나만요.','주말이 뭔지 기억하세요? 토요일, 일요일. 쉬는 날이요.','기억은 하시는데 써본 지 오래되셨군요.'],
+  ['투자자한테 뭐라고 하실 건가요?','"지난번엔 시장이 안 좋았고요"는 이미 다들 들어봤습니다.','그 말을 또 하시겠다는 얼굴이네요. 좋습니다. 연습이라도 되겠죠.'],
+  ['공동창업자는 구하셨어요?','지난번 그분은 아직 연락되세요?','…네. 그 침묵이 답이네요.'],
+  ['4대보험 신고 다시 하셔야 되는 거 아시죠?','세무사, 노무사, 법무사. 셋 다 다시 만나야 됩니다.','"이번엔 잘 챙길게요"라고 하셨죠? 지난번에도요.'],
+  ['채용 공고부터 다시 써야 해요.','"함께 성장할 분"이라고 쓰시겠죠. 또.','성장은 하죠. 대표의 흰머리가.'],
+  ['냉정하게, 지난번에 뭘 배우셨어요?','한 줄로요. 세 줄 넘어가면 못 배운 겁니다.','한 줄로 못 하시네요. 괜찮습니다. 이번엔 두 줄로 배우실 겁니다.'],
+  ['아직도 여기 계시네요.','이 버튼은 눌러도 아무것도 좋아지지 않습니다. 회사처럼요.','아, 그건 아셨군요. 그런데도.'],
+  ['엄마한테는 뭐라고 하셨어요?','"잘 되고 있어"요? 그 말 몇 번째예요?','부모님은 다 압니다. 모른 척해주는 것뿐이에요.'],
+  ['운동은 하세요?','걷는 것도 운동이에요. 회의실까지 걷는 건 빼고요.','안 하시는군요. SPACE 누르는 것도 안 하셨죠. 일관성은 있네요.'],
+  ['좋아요, 마지막 질문입니다.','왜 하는 거예요? 진짜로.','…그 대답이면 됐습니다. 가세요. 절벽은 그대로 있습니다.']
+];
+const AGAIN_ROUNDS=3; // 다시 창업하기 → 이 횟수만큼 만류 후 시작
+const YES_LABELS=['그래도 하겠습니다','진짜로 하겠습니다','…하겠다고요','알겠으니까 시작하죠'];
+const NO_FOOTS=[
+  '현명한 선택입니다. 그런데 이 버튼을 누른 사람 중 91%가 3초 뒤에 다시 창업합니다.',
+  '두 번째 망설임. 좋은 징조입니다. 그런데 손은 이미 옆 버튼 위에 있네요.',
+  '세 번 망설이면 진짜 안 하는 사람도 있습니다. 당신은 아닌 것 같지만요.'
+];
+let againCount=0, poolCursor=0, firstCursor={}, againQueue=[], againRound=0;
+function nextFromPool(n){ const out=[]; for(let i=0;i<n;i++){ out.push(AGAIN_POOL[poolCursor%AGAIN_POOL.length]); poolCursor++; } return out; }
+function showAgainRound(){
+  const a=againQueue[againRound]; const last=againRound>=againQueue.length-1;
+  $('agTag').textContent=againRound===0?'잠깐':(last?'정말 마지막으로':'하나만 더');
+  $('agTitle').textContent=a[0]; $('agDesc').textContent=a[1];
+  $('btnYes').textContent=YES_LABELS[Math.min(againRound,YES_LABELS.length-1)]; $('btnYes').dataset.foot=a[2];
+  $('btnNo').textContent=againRound===0?'…아니요, 생각 좀':'…잠깐만요';
+}
+$('btnRetry').addEventListener('click',()=>{
+  const w=(G.lastResult&&G.lastResult.why)||'자금 소진';
+  const firsts=AGAIN_FIRST[w]||AGAIN_FIRST['자금 소진']; const fi=(firstCursor[w]||0); firstCursor[w]=fi+1;
+  againQueue=[firsts[fi%firsts.length]].concat(nextFromPool(AGAIN_ROUNDS-1)); againRound=0; againCount++;
+  $('agFoot').textContent=''; showAgainRound();
+  $('ovEnd').hidden=true; $('ovAgain').hidden=false;
+});
+$('btnYes').addEventListener('click',()=>{
+  const foot=$('btnYes').dataset.foot||'';
+  if(againRound<againQueue.length-1){ againRound++; showAgainRound(); $('agFoot').textContent=foot; return; }
+  $('ovAgain').hidden=true; toast(foot); resetRun(); showStageCard(0);
+});
+$('btnNo').addEventListener('click',()=>{
+  $('agFoot').textContent=NO_FOOTS[Math.min(againRound,NO_FOOTS.length-1)];
+  $('btnYes').textContent='…역시 하겠습니다';
+});
+function resetRun(){ G.stageIdx=0; G.runway=100; G.health=100; G.team=0; G.combo=0; G.maxCombo=0; G.hits=0; G.perfects=0; G.misses=0; G.months=0; G.monthsBank=0; G.laneFlash={}; }
+function stageClear(){
+  G.running=false; if(G.stageIdx>=STAGES.length-1) return finish('clear');
+  G.stageIdx++; G.runway=Math.min(100,G.runway+18); // 라운드 클로징: 통장에 숨통
+  showStageCard(G.stageIdx);
+}
+function gameOver(why){ G.running=false; finish(why); }
+function finish(why){
+  const ended={clear:['생존했다','5년을 버텼다. 공 몇 개는 떨어뜨렸지만 돈과 사람은 놓지 않았다. 이제 진짜 시작이다.'],
+    money:['런웨이 소진','통장이 먼저 비었다. 절벽에서 떨어진 건 당신 잘못만은 아니다. 하지만 떨어진 건 당신이다.'],
+    health:['번아웃','회사보다 대표가 먼저 무너졌다. 회사는 남았지만, 당신 없이는 회사도 없다.']}[why];
+  $('endTitle').textContent=ended[0]; $('endDesc').textContent=ended[1];
+  let gr = why==='clear' ? (G.misses<=10?'S':'A') : (G.months>=60?'B':(G.months>=30?'C':'D')); $('endGrade').textContent=gr;
+  $('sMonths').textContent=G.months; $('sHits').textContent=G.hits; $('sCombo').textContent=G.maxCombo;
+  const q = why==='health'?QUOTES[8]:(why==='money'?QUOTES[2]:QUOTES[9]); $('endQuote').innerHTML='“'+q[0]+'”<em>'+q[1]+'</em>';
+  // 로컬 기록 (이 브라우저에만 남는다)
+  let list=[]; try{ list=JSON.parse(localStorage.getItem('ceoj_board')||'[]'); }catch(e){}
+  list.push({d:new Date().toISOString().slice(0,10),g:gr,m:G.months,h:G.hits,c:G.maxCombo,w:why}); list.sort((a,b)=>b.m-a.m||b.h-a.h); list=list.slice(0,5);
+  try{ localStorage.setItem('ceoj_board',JSON.stringify(list)); }catch(e){}
+  const why2={clear:'생존',money:'자금 소진',health:'번아웃'};
+  $('board').innerHTML='<div><b>내 기록 TOP 5 (이 브라우저)</b><span></span></div>'+list.map(r=>'<div><span>'+r.d+' · '+why2[r.w]+'</span><span>'+r.g+' · '+r.m+'개월 · '+r.h+'건</span></div>').join('');
+  G.lastResult={gr,why:why2[why]};
+  $('ovEnd').hidden=false;
+}
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),3800); }
+draw();
+})();
+</script>
+
+</body></html>
