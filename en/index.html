@@ -1,0 +1,461 @@
+<!doctype html><html lang="en"><head><meta name="robots" content="noindex"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#0b0e17;color:#ede8df}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Founder&rsquo;s Juggle</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Press+Start+2P&display=swap">
+<style>
+:root{
+  --bg:#0b0e17; --bg2:#121728; --rock:#2a2320; --rock2:#1a1512;
+  --ink:#ede8df; --mute:#9a95a8; --line:#262b3d;
+  --money:#f5c242; --people:#ff6b7a; --product:#43d6c5; --outside:#9b8cff;
+  --danger:#ff3b3b; --ok:#7ee081;
+  --display:"Black Han Sans","Noto Sans KR",sans-serif;
+  --pixel:"Press Start 2P","Noto Sans KR",monospace;
+  --body:"Noto Sans KR",-apple-system,sans-serif;
+}
+html,body{height:100%;margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+#stage{position:relative;width:100%;height:100%;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(11,14,23,.86);backdrop-filter:blur(4px);overflow-y:auto}
+.card{width:min(560px,100%);display:flex;flex-direction:column;gap:18px;text-align:center}
+h1{font-family:var(--display);font-size:clamp(40px,9vw,64px);line-height:1.02;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 small{display:block;font-family:var(--pixel);font-size:11px;color:var(--money);letter-spacing:.08em;margin-bottom:14px}
+h2{font-family:var(--display);font-size:clamp(28px,6vw,40px);margin:0;line-height:1.1;text-wrap:balance}
+p{margin:0;line-height:1.65;font-size:17px}
+.mute{color:#c3bfcf;font-size:15px}
+.btn{font-family:var(--display);font-size:22px;letter-spacing:.02em;padding:14px 28px;border:0;border-radius:6px;background:var(--money);color:#1a1300;cursor:pointer;box-shadow:0 4px 0 #a37d14}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a37d14}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);box-shadow:none;font-size:16px;padding:10px 18px;font-family:var(--body);font-weight:700}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.key{border-radius:8px;padding:10px 6px;background:var(--bg2);border:1px solid var(--line)}
+.key b{display:block;font-family:var(--pixel);font-size:11px;margin-bottom:6px}
+.key span{font-size:13px;font-weight:700}
+.k-money b{color:var(--money)}.k-people b{color:var(--people)}.k-product b{color:var(--product)}.k-outside b{color:var(--outside)}
+.quote{font-family:var(--body);font-size:clamp(17px,3.6vw,21px);font-weight:500;line-height:1.6;text-wrap:balance;padding:6px 0}
+.quote em{display:block;font-style:normal;font-size:13px;color:#c3bfcf;margin-top:10px;font-family:var(--body);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px 8px}
+.stat b{display:block;font-family:var(--pixel);font-size:16px;color:var(--money);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:#c3bfcf}
+.grade{font-family:var(--pixel);font-size:44px;color:var(--money);text-shadow:0 0 24px rgba(245,194,66,.4)}
+.board{text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13px}
+.board div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.board div:last-child{border:0}
+.toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+#touch{position:absolute;left:0;right:0;bottom:0;height:34%;display:none;pointer-events:none}
+@media (pointer:coarse){#touch{display:block}}
+.mash{font-family:var(--pixel);font-size:12px;color:var(--danger);animation:blink .5s steps(2) infinite}
+@keyframes blink{to{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.mash{animation:none}}
+</style>
+
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="touch"></div>
+
+  <div class="ov" id="ovTitle">
+    <div class="card">
+      <h1><small>STARTUP CEO RHYTHM</small>The Founder&rsquo;s Juggle</h1>
+      <p>A startup CEO throws a few dozen balls a day. Hiring, payroll, fundraising, procurement, outages, offer letters. Stand at the edge of the cliff and keep the rhythm.</p>
+      <p class="mute">Drop a ball and money leaks. Skip rest and your body gives out. And sometimes, no matter how well you play, the Fed raises rates.</p>
+      <div class="keys">
+        <div class="key k-money"><b>D</b><span>Capital</span></div>
+        <div class="key k-people"><b>F</b><span>People</span></div>
+        <div class="key k-product"><b>J</b><span>Product</span></div>
+        <div class="key k-outside"><b>K</b><span>Market</span></div>
+      </div>
+      <p class="mute">Arrow keys work too. SPACE is <b style="color:var(--ink)">catch your breath</b>. Health refills, but the balls keep falling. On a phone, tap the lanes and the SPACE button on the left.</p>
+      <div class="row"><button class="btn" id="btnStart">Incorporate</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovStage" hidden>
+    <div class="card">
+      <p class="mute" id="stTag">STAGE 1</p>
+      <h2 id="stTitle"></h2>
+      <p id="stDesc"></p>
+      <div class="quote" id="stQuote"></div>
+      <div class="row"><button class="btn" id="btnGo">Start</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovEnd" hidden>
+    <div class="card">
+      <div class="grade" id="endGrade">B</div>
+      <h2 id="endTitle"></h2>
+      <p id="endDesc"></p>
+      <div class="stats">
+        <div class="stat"><b id="sMonths">0</b><span>Months survived</span></div>
+        <div class="stat"><b id="sHits">0</b><span>Balls caught</span></div>
+        <div class="stat"><b id="sCombo">0</b><span>Best combo</span></div>
+      </div>
+      <div class="quote" id="endQuote"></div>
+      <div class="board" id="board"></div>
+      <div class="row"><button class="btn" id="btnRetry">Found another one</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovAgain" hidden>
+    <div class="card">
+      <p class="mute" id="agTag">Hold on</p>
+      <h2 id="agTitle">Are you sure about this?</h2>
+      <p id="agDesc"></p>
+      <div class="row">
+        <button class="btn ghost" id="btnNo">&hellip;no, let me think</button>
+        <button class="btn" id="btnYes">I am doing it anyway</button>
+      </div>
+      <p class="mute" id="agFoot"></p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+// ---------- content ----------
+const LANES = {
+  money:  {name:'Capital', color:'#f5c242', key:'D', tasks:['Runway math','Payroll run','Burn rate','Fundraising','Term sheet','Investor update','Investor ghost','Board meeting','Investor deck','Down round','Anti-dilution','83(b) election','409A','SAFE stack','Note conversion','Inference bill','GPU contract','Credits expire','Wire fraud','Sales tax nexus','Data room','D&O insurance','Founder salary','Secondary sale','1099 season']},
+  people: {name:'People',  color:'#ff6b7a', key:'F', tasks:['Recruiting','VP hire','Reference call','Offer letter','H-1B filing','Visa RFE','Health plan','Onboarding','Offboarding','On a PIP','1:1s','Comp bands','Equity refresh','Vesting cliff','Layoffs','First layoff','Severance','Toxic star','Star quits','HR complaint','I-9 audit','WARN notice','Slack apology','All-hands','Replaced by AI?','Reskill or cut','Firing a friend','Cofounder fight']},
+  product:{name:'Product', color:'#43d6c5', key:'J', tasks:['User interviews','Roadmap','Prod is down','Demo broke','Postmortem','Evals failing','Model sunset','Prompt drift','Hallucination','Injection bug','Agent runaway','Vibe-coded bug','Rate limited','Vendor outage','Context limit','GPU waitlist','Tech debt','Churn analysis','Pricing page','Feature or co?','Escalation','Data breach','IP assignment','Training data','3am page',"Doctor's appt"]},
+  outside:{name:'Market',  color:'#9b8cff', key:'K', tasks:['Sales pipeline','Cold DM','CEO cold call','Demo no-show','Champion dark','MSA redlines','Procurement','Vendor security','AI vendor gate','Data training Q','AI committee','SOC 2 audit','Pen test','DPA','Indemnity ask','Rival launch','Logo slide ask','Empty booth','Press embargo','Embargo leak','Viral tweet','Customer board','Cancel vacation']}
+};
+const ORDER = ['money','people','product','outside'];
+const SHOCKS = [
+  {t:'Fed hikes rates',     d:'The window shuts. The deal you were negotiating evaporates.'},
+  {t:'Your bank fails',     d:'It is Friday. Payroll is Monday. Everything is frozen.'},
+  {t:'OpenAI ships it',     d:'You watched your roadmap in someone else’s keynote.'},
+  {t:'Lead pulls out',      d:'"Internal reasons. We won’t be able to lead this round."'},
+  {t:'Staff eng poached',   d:'Double the comp. Thursday afternoon. No counter works.'},
+  {t:'Top logo churns',     d:'Thirty percent of revenue, gone in one email.'},
+  {t:'Rival raises $100M',  d:'Same market. Ten times the capital. Announced this morning.'},
+  {t:'us-east-1 is down',   d:'3am. The pager will not stop. It is not even your bug.'},
+  {t:'Security breach',     d:'You have 72 hours to tell every customer.'},
+  {t:'Cofounder splits',    d:'A divorce with a cap table, and the board is watching.'},
+  {t:'Employment claim',    d:'An envelope you did not expect.'},
+  {t:'Model deprecated',    d:'The endpoint you were built on sunsets next month.'},
+  {t:'Acquihire offer',     d:'They want the team. Not the company. Not the mission.'},
+  {t:'Pandemic',            d:'The world stopped. Your plan became paper.'}
+];
+const QUOTES = [
+  ['Peacetime CEO knows that proper protocol leads to winning. Wartime CEO violates protocol in order to win.','Ben Horowitz'],
+  ['The hard thing is laying people off when you miss the big goal.','Ben Horowitz'],
+  ['Only the paranoid survive.','Andy Grove'],
+  ['A manager’s output is the output of his organization.','Andy Grove'],
+  ['Startups rarely die in mid keystroke. So keep typing.','Paul Graham'],
+  ['Default alive, or default dead?','Paul Graham'],
+  ['Day 2 is stasis. Followed by irrelevance. Followed by excruciating, painful decline. Followed by death.','Jeff Bezos'],
+  ['A players hire A players. B players hire C players.','Steve Jobs'],
+  ['An organization is a machine with two parts. Culture and people.','Ray Dalio'],
+  ['The best thing you can do for employees is hire only high performers.','Reed Hastings'],
+  ['Everything can be delegated except money and people. Everything.','The Founder’s Juggle'],
+  ['You can play perfectly and still lose. That is not a bug in the game.','The Founder’s Juggle'],
+  ['Your body is company infrastructure. Nobody put it on the org chart.','The Founder’s Juggle'],
+  ['There is no one left to ask. That is the job you signed up for.','The Founder’s Juggle']
+];
+const STAGES = [
+  {name:'Garage',      year:'Year 1', lanes:['product','money'],                   bpm:92,  secs:32, shocks:0, density:.55, desc:'Two of you and a repo. Build, then check the balance. You thought these were the only two balls.'},
+  {name:'First Hire',  year:'Year 2', lanes:['product','money','people'],          bpm:104, secs:38, shocks:1, density:.62, desc:'Someone joined. Offer letter, health plan, I-9, onboarding. One more ball, and suddenly not enough hands.'},
+  {name:'Finding PMF', year:'Year 3', lanes:['money','people','product','outside'],bpm:116, secs:44, shocks:1, density:.68, desc:'Sales and fundraising arrive. Four balls now. The market does not care about your situation.'},
+  {name:'Series A',    year:'Year 4', lanes:['money','people','product','outside'],bpm:128, secs:50, shocks:2, density:.76, desc:'You have a board now. Hit the People lane well and the team covers Product and Market for a while. Money and people stay yours.'},
+  {name:'Scaling',     year:'Year 5', lanes:['money','people','product','outside'],bpm:140, secs:56, shocks:3, density:.84, desc:'The tempo is absurd. Survive this and you are a founder. Fail and you are one anyway.'}
+];
+
+// ---------- state ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W=0,H=0,DPR=1;
+const G = {
+  running:false, stageIdx:0, stage:null, lanes:[], notes:[], t0:0, now:0, lastBeat:-1,
+  runway:100, health:100, team:0, delegUntil:0,
+  combo:0, maxCombo:0, hits:0, perfects:0, misses:0, months:0, monthsBank:0,
+  shake:0, flashes:[], particles:[], resting:false, restUntil:0,
+  shock:null, shockPlan:[], msg:null, keyDown:{}, laneFlash:{}, ended:false, fatigue:0
+};
+const HIT_Y = ()=> H*0.80;
+const SPEED = ()=> H*0.55/1000; // px per ms (travel 1000ms visible)
+let audio=null;
+function beep(freq,dur,type,vol){ if(!audio) return; try{ const o=audio.createOscillator(), g=audio.createGain(); o.type=type||'square'; o.frequency.value=freq; g.gain.value=vol||.05; o.connect(g); g.connect(audio.destination); const t=audio.currentTime; g.gain.setValueAtTime(vol||.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.start(t); o.stop(t+dur);}catch(e){} }
+function noise(dur,vol){ if(!audio) return; try{ const b=audio.createBuffer(1,audio.sampleRate*dur,audio.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length); const s=audio.createBufferSource(); s.buffer=b; const g=audio.createGain(); g.gain.value=vol||.2; s.connect(g); g.connect(audio.destination); s.start(); }catch(e){} }
+
+function resize(){ DPR=Math.min(window.devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener('resize',resize); resize();
+
+function rnd(a){ return a[Math.floor(Math.random()*a.length)]; }
+function laneX(i){ const n=G.lanes.length; const left=W*0.30, right=W-16; const w=(right-left)/n; return left+w*i+w/2; }
+function laneW(){ const n=G.lanes.length; return (W-16-W*0.30)/n; }
+
+// ---------- stages ----------
+function startStage(i){
+  G.stageIdx=i; const s=STAGES[i]; G.stage=s; G.lanes=ORDER.filter(k=>s.lanes.includes(k)); G.notes=[]; G.particles=[]; G.flashes=[];
+  G.t0=performance.now(); G.now=0; G.lastBeat=-1; G.shock=null; G.msg=null; G.delegUntil=0; G.resting=false; G.fatigue=0;
+  // 충격 이벤트 예정 시각
+  G.shockPlan=[]; for(let k=0;k<s.shocks;k++){ G.shockPlan.push(s.secs*1000*(0.3+0.5*(k+Math.random()*.6)/(s.shocks))); }
+  G.shockPlan.sort((a,b)=>a-b);
+  G.running=true; G.ended=false; requestAnimationFrame(loop);
+}
+function beatMs(){ return 60000/G.stage.bpm; }
+function scheduleNotes(){
+  const bm=beatMs(); const beat=Math.floor((G.now+1400)/bm); // 1.4초 앞서 생성
+  while(G.lastBeat<beat){ G.lastBeat++; const t=G.lastBeat*bm; if(t<1200) continue; if(t>G.stage.secs*1000-600) continue;
+    if(Math.random()<G.stage.density){ const li=Math.floor(Math.random()*G.lanes.length); const lk=G.lanes[li]; G.notes.push({lane:li,kind:lk,t:t,label:rnd(LANES[lk].tasks),state:0}); }
+    // 고밀도 스테이지는 가끔 2개 동시
+    if(G.stageIdx>=3 && Math.random()<0.18){ let lj=Math.floor(Math.random()*G.lanes.length); const lk=G.lanes[lj]; if(!G.notes.some(n=>n.t===t&&n.lane===lj)) G.notes.push({lane:lj,kind:lk,t:t,label:rnd(LANES[lk].tasks),state:0}); }
+  }
+}
+function judge(li){
+  if(!G.running||G.shock) return;
+  G.laneFlash[li]=G.now;
+  let best=null,bd=1e9;
+  for(const n of G.notes){ if(n.state||n.lane!==li) continue; const d=Math.abs(n.t-G.now); if(d<bd){bd=d;best=n;} }
+  if(best && bd<=170){ hit(best, bd<=80?'PERFECT':'GOOD'); }
+  else { // 헛스윙: 건강 살짝 소모
+    G.health=Math.max(0,G.health-0.6); beep(120,.05,'triangle',.03);
+  }
+}
+function hit(n,q){
+  n.state=1; const perfect=q==='PERFECT'; G.hits++; if(perfect) G.perfects++; G.combo++; G.maxCombo=Math.max(G.maxCombo,G.combo);
+  const gain = perfect?1.0:0.6;
+  if(n.kind==='money'){ G.runway=Math.min(100,G.runway+5*gain); }
+  if(n.kind==='people'){ G.team=Math.min(100,G.team+14*gain); if(G.team>=100 && G.stageIdx>=3){ G.team=0; G.delegUntil=G.now+8000; say('Team covers Product and Market (8s)','#7ee081'); } }
+  // 일은 건강을 쓴다
+  G.health=Math.max(0,G.health-(0.9-0.3*gain));
+  G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:q,color:perfect?'#fff':LANES[n.kind].color,t:G.now});
+  burst(laneX(n.lane),HIT_Y(),LANES[n.kind].color,perfect?14:8);
+  beep(perfect?880:660,.08,'square',.05); if(G.combo%10===0) beep(1320,.12,'square',.05);
+}
+function miss(n){
+  n.state=2; G.misses++; G.combo=0;
+  const dmg = n.kind==='money'?7:(n.kind==='people'?6:4);
+  G.runway=Math.max(0,G.runway-dmg); G.health=Math.max(0,G.health-2.2);
+  G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:'MISS',color:'#ff3b3b',t:G.now}); G.shake=Math.max(G.shake,6);
+  noise(.08,.12);
+}
+function burst(x,y,color,n){ for(let i=0;i<n;i++){ const a=Math.random()*Math.PI*2, s=1+Math.random()*4; G.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:1,color}); } }
+function say(text,color){ G.msg={text,color:color||'#ede8df',t:G.now}; }
+
+function triggerShock(){
+  const sh=rnd(SHOCKS); G.shock={info:sh,t:G.now,mash:0,need:8+G.stageIdx*3,phase:0};
+  // 와장창: 떠 있는 공 전부 깨진다
+  let n=0; for(const x of G.notes){ if(!x.state){ x.state=3; n++; burst(laneX(x.lane), HIT_Y()-(x.t-G.now)*SPEED(), '#ff3b3b', 6);} }
+  G.combo=0; G.runway=Math.max(0,G.runway-12-G.stageIdx*2); G.shake=22; noise(.5,.35); beep(55,.6,'sawtooth',.12);
+}
+
+// ---------- loop ----------
+let lastFrame=0;
+function loop(ts){
+  if(!G.running) return;
+  const dt=Math.min(50,ts-(lastFrame||ts)); lastFrame=ts;
+  if(G.shock){ // 시간 정지, 버티기
+    if(ts-G.shock.realT0>4200) { const ok=G.shock.mash>=G.shock.need; endShockReal(ok, ts); }
+    draw(); requestAnimationFrame(loop); return;
+  }
+  G.now=ts-G.t0;
+  scheduleNotes();
+  // 미스 판정
+  for(const n of G.notes){ if(!n.state && G.now-n.t>170){ if(G.delegUntil>G.now && (n.kind==='product'||n.kind==='outside')){ n.state=1; G.hits++; G.flashes.push({x:laneX(n.lane),y:HIT_Y()-40,text:'TEAM',color:'#7ee081',t:G.now}); } else miss(n);} }
+  G.notes=G.notes.filter(n=>n.state===0 || G.now-n.t<600);
+  // 자원 흐름
+  const sec=dt/1000;
+  G.runway=Math.max(0,G.runway-(1.6+G.stageIdx*0.45)*sec);   // 돈은 항상 샌다
+  if(G.resting){ if(G.now>G.restUntil){ G.resting=false; } else G.health=Math.min(100,G.health+16*sec); }
+  else { G.fatigue+=sec; G.health=Math.max(0,G.health-(0.35+G.stageIdx*0.12)*sec); }
+  G.monthsBank+=sec; if(G.monthsBank>=2.2){ G.monthsBank-=2.2; G.months++; }
+  // 충격
+  if(G.shockPlan.length && G.now>=G.shockPlan[0]){ G.shockPlan.shift(); triggerShock(); G.shock.realT0=ts; }
+  // 파티클
+  for(const p of G.particles){ p.x+=p.vx; p.y+=p.vy; p.vy+=.15; p.life-=.03; } G.particles=G.particles.filter(p=>p.life>0);
+  G.shake*=0.86;
+  // 종료
+  if(G.runway<=0) return gameOver('money');
+  if(G.health<=0) return gameOver('health');
+  if(G.now>=G.stage.secs*1000+400) return stageClear();
+  draw(); requestAnimationFrame(loop);
+}
+function endShockReal(ok, ts){
+  const s=G.shock; G.shock=null;
+  const paused=ts-s.realT0; G.t0+=paused;  // 정지 시간만큼 기준점 이동
+  for(const k in G.shockPlan) G.shockPlan[k]=G.shockPlan[k];
+  if(ok){ say('You held on. Keep going.','#7ee081'); beep(660,.15,'square',.06); }
+  else { G.runway=Math.max(0,G.runway-10); G.health=Math.max(0,G.health-12); say('You did not hold. Runway and health took the hit.','#ff3b3b'); noise(.3,.3); }
+}
+
+// ---------- render ----------
+function draw(){
+  ctx.save(); if(G.shake>0.5){ ctx.translate((Math.random()-.5)*G.shake,(Math.random()-.5)*G.shake); }
+  // 배경 밤하늘
+  const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0b0e17'); g.addColorStop(1,'#151b2e'); ctx.fillStyle=g; ctx.fillRect(-20,-20,W+40,H+40);
+  // 별
+  ctx.fillStyle='rgba(237,232,223,.35)'; for(let i=0;i<40;i++){ const x=(i*97)%W, y=(i*53)%(H*0.6); ctx.fillRect(x,y,1.5,1.5); }
+  drawCliff(); drawLanes(); drawNotes(); drawParticles(); if(G.stage) drawHUD();
+  if(G.shock) drawShock();
+  ctx.restore();
+}
+function drawCliff(){
+  // 절벽: 왼쪽 땅. 런웨이가 줄수록 땅이 깎여 대표가 절벽 끝에 선다.
+  const groundY=H*0.86; const edge=W*0.06+ (W*0.20)*(G.runway/100);
+  ctx.fillStyle='#1a1512'; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(edge,groundY); ctx.lineTo(edge-14,groundY+30); ctx.lineTo(edge-30,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#2a2320'; ctx.fillRect(0,groundY,edge,8);
+  // 대표 (픽셀 인간)
+  const px=edge-22, py=groundY; const lean=G.runway<25? Math.sin(G.now/120)*3:0;
+  ctx.save(); ctx.translate(px+lean,py);
+  const skin=G.health<30?'#c9b7b0':'#f1d3c0', shirt=G.resting?'#7ee081':'#ede8df';
+  ctx.fillStyle=skin; ctx.fillRect(-7,-46,14,14); // 머리
+  ctx.fillStyle='#22180f'; ctx.fillRect(-7,-46,14,4); // 머리카락
+  ctx.fillStyle=shirt; ctx.fillRect(-9,-32,18,18); // 몸
+  ctx.fillStyle='#2d3a5a'; ctx.fillRect(-8,-14,7,14); ctx.fillRect(1,-14,7,14); // 다리
+  // 팔: 저글링
+  ctx.fillStyle=skin; const arm=Math.sin(G.now/150)*6; ctx.fillRect(-15,-30+arm,6,4); ctx.fillRect(9,-30-arm,6,4);
+  // 눈 (건강 낮으면 다크서클)
+  ctx.fillStyle='#22180f'; ctx.fillRect(-4,-40,2,2); ctx.fillRect(2,-40,2,2); if(G.health<40){ ctx.fillStyle='#6a4a6a'; ctx.fillRect(-4,-38,2,1); ctx.fillRect(2,-38,2,1);}
+  // 머리 위 저글링 공
+  for(let i=0;i<G.lanes.length;i++){ const ph=G.now/300+i*Math.PI*2/G.lanes.length; ctx.fillStyle=LANES[G.lanes[i]].color; ctx.beginPath(); ctx.arc(Math.cos(ph)*16, -60+Math.sin(ph)*10, 4,0,Math.PI*2); ctx.fill(); }
+  ctx.restore();
+  // 절벽 아래 표시
+  ctx.fillStyle='#ff6b6b'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText('RUNWAY', 8, groundY+28);
+  ctx.fillStyle='#fff'; ctx.font='bold 22px "Noto Sans KR"'; ctx.fillText(Math.round(G.runway)+'%', 8, groundY+54);
+}
+function drawLanes(){
+  const n=G.lanes.length, lw=laneW(), hy=HIT_Y();
+  for(let i=0;i<n;i++){ const x=laneX(i)-lw/2; const k=G.lanes[i]; const c=LANES[k].color;
+    ctx.fillStyle= (i%2? 'rgba(255,255,255,.025)':'rgba(255,255,255,.045)'); ctx.fillRect(x,0,lw,H);
+    const f=G.laneFlash[i]; if(f!==undefined && G.now-f<120){ ctx.fillStyle=c+'33'; ctx.fillRect(x,0,lw,H); }
+    // 히트존
+    ctx.strokeStyle=c; ctx.lineWidth=2; ctx.globalAlpha=.9; ctx.beginPath(); ctx.arc(laneX(i),hy,Math.min(26,lw*0.32),0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+    // 키 라벨
+    ctx.fillStyle=c; ctx.font='16px "Press Start 2P"'; ctx.textAlign='center'; ctx.fillText(LANES[k].key, laneX(i), hy+52);
+    ctx.fillStyle='#fff'; ctx.font='bold 17px "Noto Sans KR"'; ctx.fillText(LANES[k].name, laneX(i), hy+76);
+    if(G.delegUntil>G.now && (k==='product'||k==='outside')){ ctx.fillStyle='rgba(126,224,129,.15)'; ctx.fillRect(x,0,lw,H); ctx.fillStyle='#7ee081'; ctx.font='bold 15px "Noto Sans KR"'; ctx.fillText('Team has it', laneX(i), hy-90); }
+  }
+  ctx.strokeStyle='rgba(237,232,223,.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W*0.30,hy); ctx.lineTo(W-16,hy); ctx.stroke();
+}
+function drawNotes(){
+  const hy=HIT_Y(), sp=SPEED(), lw=laneW(); const r=Math.min(18,lw*0.22);
+  for(const n of G.notes){ const y=hy-(n.t-G.now)*sp; if(y<-40||y>H+40) continue; const x=laneX(n.lane); const c=LANES[n.kind].color;
+    if(n.state===0){ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.arc(x+r*.3,y+r*.3,r*.55,0,Math.PI*2); ctx.fill();
+      const fs=lw<80?13:16; ctx.font='bold '+fs+'px "Noto Sans KR"'; ctx.textAlign='center'; const tw=ctx.measureText(n.label).width+16; 
+      ctx.fillStyle='rgba(11,14,23,.92)'; ctx.fillRect(x-tw/2,y+r+4,tw,fs+10); ctx.strokeStyle=c; ctx.lineWidth=1.5; ctx.strokeRect(x-tw/2,y+r+4,tw,fs+10);
+      ctx.fillStyle='#fff'; ctx.fillText(n.label,x,y+r+4+fs+2); }
+    else if(n.state===2){ ctx.globalAlpha=Math.max(0,1-(G.now-n.t)/500); ctx.fillStyle='#ff3b3b'; ctx.beginPath(); ctx.arc(x,hy+(G.now-n.t)*.25,r*.8,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; }
+  }
+  for(const f of G.flashes){ const a=1-(G.now-f.t)/600; if(a<=0) continue; ctx.globalAlpha=a; ctx.fillStyle=f.color; ctx.font='14px "Press Start 2P"'; ctx.textAlign='center'; ctx.fillText(f.text,f.x,f.y-(1-a)*30); }
+  ctx.globalAlpha=1; G.flashes=G.flashes.filter(f=>G.now-f.t<600);
+}
+function drawParticles(){ for(const p of G.particles){ ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.fillRect(p.x,p.y,3,3);} ctx.globalAlpha=1; }
+function bar(x,y,w,h,v,color,label){ ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(x,y,w,h); ctx.fillStyle=color; ctx.fillRect(x,y,w*Math.max(0,Math.min(1,v/100)),h); ctx.fillStyle='#ede8df'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText(label,x,y-7); }
+function drawHUD(){
+  const s=G.stage; const left=W*0.30+8;
+  ctx.fillStyle='#f5c242'; ctx.font='11px "Press Start 2P"'; ctx.textAlign='left'; ctx.fillText('STAGE '+(G.stageIdx+1)+'/5', left, 20);
+  ctx.fillStyle='#fff'; ctx.font='bold 20px "Noto Sans KR"'; ctx.fillText(s.name+'  '+s.year, left, 44);
+  const prog=Math.min(1,G.now/(s.secs*1000)); ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(left,52,W-16-left,4); ctx.fillStyle='#ede8df'; ctx.fillRect(left,52,(W-16-left)*prog,4);
+  // 콤보
+  ctx.textAlign='right'; ctx.fillStyle=G.combo>=10?'#f5c242':'#ede8df'; ctx.font=(G.combo>=10?'16px':'12px')+' "Press Start 2P"'; ctx.fillText(G.combo+' COMBO', W-16, 22);
+  // 왼쪽 자원 바
+  const bx=8, bw=W*0.30-24;
+  bar(bx,80,bw,12,G.health, G.health<30?'#ff3b3b':'#7ee081','HEALTH');
+  bar(bx,116,bw,12,G.team,'#ff6b7a','TEAM');
+  ctx.fillStyle='#ede8df'; ctx.font='11px "Press Start 2P"'; ctx.fillText('MONTH '+G.months, bx, 152);
+  if(G.resting){ ctx.fillStyle='#7ee081'; ctx.font='bold 15px "Noto Sans KR"'; ctx.textAlign='left'; ctx.fillText('Resting. Balls still fall', bx, 180, bw); }
+  else if(G.health<30){ ctx.fillStyle='#ff3b3b'; ctx.font='bold 15px "Noto Sans KR"'; ctx.textAlign='left'; ctx.fillText('Health critical. Rest', bx, 180, bw); }
+  // SPACE 버튼 (폰: 왼쪽 영역 터치)
+  const bwid=W*0.30-24, bh=Math.max(52,H*0.09), byy=H*0.86-bh-104, pressed=G.resting||(G.shock&&performance.now()-(G.lastSpace||0)<120);
+  ctx.fillStyle=G.shock?'#ff3b3b':(G.resting?'#7ee081':'rgba(255,255,255,.10)'); ctx.beginPath(); ctx.roundRect(8,byy+(pressed?3:0),bwid,bh,10); ctx.fill();
+  ctx.strokeStyle=G.shock?'#fff':'rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.fillStyle=G.shock||G.resting?'#0b0e17':'#fff'; ctx.textAlign='center'; ctx.font='11px "Press Start 2P"'; ctx.fillText('SPACE',8+bwid/2,byy+(pressed?3:0)+bh/2-6);
+  ctx.font='bold 14px "Noto Sans KR"'; ctx.fillText(G.shock?'HOLD ON':(G.resting?'Resting':'Breathe'),8+bwid/2,byy+(pressed?3:0)+bh/2+14);
+  if(G.msg && G.now-G.msg.t<2200){ ctx.globalAlpha=Math.min(1,(2200-(G.now-G.msg.t))/500); ctx.fillStyle=G.msg.color; ctx.font='bold 20px "Noto Sans KR"'; ctx.textAlign='center'; ctx.fillText(G.msg.text,(W*0.30+W)/2,H*0.30); ctx.globalAlpha=1; }
+}
+function drawShock(){
+  const s=G.shock; ctx.fillStyle='rgba(120,0,0,.45)'; ctx.fillRect(-20,-20,W+40,H+40);
+  const cx=W/2, cy=H*0.42;
+  ctx.textAlign='center'; ctx.fillStyle='#ff3b3b'; ctx.font='bold 16px "Noto Sans KR"'; ctx.fillText('!!!  EXTERNAL SHOCK  !!!',cx,cy-74);
+  ctx.fillStyle='#fff'; ctx.font='bold '+Math.min(34,W/14)+'px "Black Han Sans"'; ctx.fillText(s.info.t,cx,cy-24);
+  ctx.fillStyle='#fff'; ctx.font='17px "Noto Sans KR"'; ctx.fillText(s.info.d,cx,cy+10);
+  ctx.fillStyle='#f5c242'; ctx.font='bold 18px "Noto Sans KR"'; ctx.fillText('Every ball shattered. Mash SPACE (left button) to hold on',cx,cy+44);
+  const w=Math.min(320,W-60); ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fillRect(cx-w/2,cy+62,w,14); ctx.fillStyle='#f5c242'; ctx.fillRect(cx-w/2,cy+62,w*Math.min(1,s.mash/s.need),14);
+  const remain=Math.max(0,4.2-(performance.now()-s.realT0)/1000); ctx.fillStyle='#fff'; ctx.font='14px "Press Start 2P"'; ctx.fillText(remain.toFixed(1)+'s  '+s.mash+'/'+s.need,cx,cy+104);
+}
+
+// ---------- input ----------
+function pressSpace(){
+  if(!G.running) return; G.lastSpace=performance.now();
+  if(G.shock){ G.shock.mash++; G.shake=8; beep(200+G.shock.mash*20,.05,'square',.04); return; }
+  if(!G.resting){ G.resting=true; G.restUntil=G.now+1500; }
+}
+const KEYMAP={'KeyD':'money','KeyF':'people','KeyJ':'product','KeyK':'outside','ArrowLeft':'money','ArrowDown':'people','ArrowUp':'product','ArrowRight':'outside'};
+window.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.code==='Space'){ e.preventDefault(); pressSpace(); return; }
+  if(KEYMAP[e.code]!==undefined){ e.preventDefault(); const li=G.lanes.indexOf(KEYMAP[e.code]); if(li>=0) judge(li); }
+});
+const touch=document.getElementById('touch');
+cv.addEventListener('pointerdown',e=>{
+  if(!G.running) return; const x=e.clientX-cv.getBoundingClientRect().left;
+  if(x<W*0.30){ pressSpace(); return; }
+  if(G.shock){ pressSpace(); return; }
+  const lw=laneW(); const li=Math.floor((x-W*0.30)/lw); if(li>=0&&li<G.lanes.length) judge(li);
+});
+
+// ---------- flow ----------
+const $=id=>document.getElementById(id);
+function showStageCard(i){
+  const s=STAGES[i]; $('stTag').textContent='STAGE '+(i+1)+' / 5  ·  '+s.year; $('stTitle').textContent=s.name; $('stDesc').textContent=s.desc;
+  const q=QUOTES[[0,4,3,6,1][i]]; $('stQuote').innerHTML='“'+q[0]+'”<em>'+q[1]+'</em>';
+  $('ovStage').hidden=false;
+}
+$('btnStart').addEventListener('click',()=>{ try{ audio=audio||new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); }catch(e){} $('ovTitle').hidden=true; resetRun(); showStageCard(0); });
+$('btnGo').addEventListener('click',()=>{ $('ovStage').hidden=true; startStage(G.stageIdx); });
+const AGAIN=[
+  ['You just fell off a cliff.','Statistically, most people fall the second time too. Still?','The ones who say "still" become founders. Congratulations. Or condolences.'],
+  ['You burned out last time.','Are you going to press SPACE this round?','Your body is company infrastructure. You are going again without inspecting it.'],
+  ['Five years. You proved it already.','You really want to go around again?','This is founder mythology at work, and you are doing it to yourself.'],
+  ['Did you talk to anyone about this?','How is the bank account? The real one, not the credit line.','"If I do not do it, who will" is what every founder says. All of them.'],
+  ['A job pays you every month.','Every month. Automatically. They even withhold the taxes.','So you knew. And you are still doing it.']
+];
+let againIdx=0, againCount=0;
+$('btnRetry').addEventListener('click',()=>{
+  const w=(G.lastResult&&G.lastResult.why)||''; let pick=0;
+  if(w==='Burned out') pick=1; else if(w==='Survived') pick=2; else pick=[0,3,4][againCount%3];
+  againCount++; const a=AGAIN[pick];
+  $('agTitle').textContent=a[0]; $('agDesc').textContent=a[1]; $('agFoot').textContent='';
+  $('btnYes').textContent='I am doing it anyway'; $('btnYes').dataset.foot=a[2];
+  $('ovEnd').hidden=true; $('ovAgain').hidden=false;
+});
+$('btnYes').addEventListener('click',()=>{ $('ovAgain').hidden=true; toast($('btnYes').dataset.foot||''); resetRun(); showStageCard(0); });
+$('btnNo').addEventListener('click',()=>{
+  $('agFoot').textContent='Wise. Although 91% of people who press this button incorporate again within three seconds.';
+  $('btnYes').textContent='…fine, I am doing it';
+});
+function resetRun(){ G.stageIdx=0; G.runway=100; G.health=100; G.team=0; G.combo=0; G.maxCombo=0; G.hits=0; G.perfects=0; G.misses=0; G.months=0; G.monthsBank=0; G.laneFlash={}; }
+function stageClear(){
+  G.running=false; if(G.stageIdx>=STAGES.length-1) return finish('clear');
+  G.stageIdx++; G.runway=Math.min(100,G.runway+18); // 라운드 클로징: 통장에 숨통
+  showStageCard(G.stageIdx);
+}
+function gameOver(why){ G.running=false; finish(why); }
+function finish(why){
+  const ended={clear:['You survived','Five years. You dropped some balls, but never money and never people. Now the real thing starts.'],
+    money:['Out of runway','The account emptied first. The fall was not entirely your fault. But you are the one who fell.'],
+    health:['Burned out','The founder broke before the company did. The company is still standing. Without you, it is not.']}[why];
+  $('endTitle').textContent=ended[0]; $('endDesc').textContent=ended[1];
+  let gr = why==='clear' ? (G.misses<=10?'S':'A') : (G.months>=60?'B':(G.months>=30?'C':'D')); $('endGrade').textContent=gr;
+  $('sMonths').textContent=G.months; $('sHits').textContent=G.hits; $('sCombo').textContent=G.maxCombo;
+  const q = why==='health'?QUOTES[8]:(why==='money'?QUOTES[2]:QUOTES[9]); $('endQuote').innerHTML='“'+q[0]+'”<em>'+q[1]+'</em>';
+  // 로컬 기록 (이 브라우저에만 남는다)
+  let list=[]; try{ list=JSON.parse(localStorage.getItem('ceoj_board')||'[]'); }catch(e){}
+  list.push({d:new Date().toISOString().slice(0,10),g:gr,m:G.months,h:G.hits,c:G.maxCombo,w:why}); list.sort((a,b)=>b.m-a.m||b.h-a.h); list=list.slice(0,5);
+  try{ localStorage.setItem('ceoj_board',JSON.stringify(list)); }catch(e){}
+  const why2={clear:'Survived',money:'Ran out of cash',health:'Burned out'};
+  $('board').innerHTML='<div><b>Your top 5 (this browser only)</b><span></span></div>'+list.map(r=>'<div><span>'+r.d+' · '+why2[r.w]+'</span><span>'+r.g+' · '+r.m+'mo &middot; '+r.h+'</span></div>').join('');
+  G.lastResult={gr,why:why2[why]};
+  $('ovEnd').hidden=false;
+}
+function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),3800); }
+draw();
+})();
+</script>
+
+</body></html>
